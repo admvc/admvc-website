@@ -38,8 +38,11 @@ export default async function HomePage() {
       <section className="relative overflow-hidden rounded-2xl border border-soft bg-bg2">
         <div className="absolute inset-0">
           <img
-            src="/images/hero_teste.png"
-            alt="Culto e comunhao na ADMVC"
+            src="/images/hero-culto.jpg"
+            alt="Culto e comunhão na ADMVC"
+            width={2000}
+            height={600}
+            fetchPriority="high"
             className="h-full w-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/15" />

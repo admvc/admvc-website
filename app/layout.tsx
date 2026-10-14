@@ -5,6 +5,7 @@ import "./globals.css";
 import { SITE_NAME, SITE_TAGLINE } from "@/lib/constants";
 import SiteHeader from "@/components/ui/site-header";
 import SiteFooter from "@/components/ui/site-footer";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: {
@@ -31,14 +32,12 @@ export const metadata: Metadata = {
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description:
       "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
-    images: [{ url: "/images/hero_teste.png", width: 1200, height: 630, alt: "ADMVC - Mais que uma igreja, uma família" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description:
       "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
-    images: ["/images/hero_teste.png"],
   },
 };
 
@@ -51,14 +50,14 @@ export const viewport = {
 const jsonLd = {
   "@context": "https://schema.org",
   "@type": "Church",
-  name: "ADMVC - Assembleia de Deus Ministerio Visao de Conquista",
+  name: "ADMVC - Assembleia de Deus Ministério Visão de Conquista",
   alternateName: "ADMVC",
   url: "https://www.igrejaadmvc.org",
   description:
     "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
   address: {
     "@type": "PostalAddress",
-    streetAddress: "R. Antonio Pestana Rato 77",
+    streetAddress: "R. António Pestana Rato 77",
     addressLocality: "Figueira da Foz",
     postalCode: "3080-014",
     addressCountry: "PT",
@@ -82,6 +81,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SiteHeader />
         <main className="mx-auto w-full max-w-6xl px-4 py-8">{children}</main>
         <SiteFooter />
+        {/* Visitas por página, sem cookies (ligar em Vercel → Analytics) */}
+        <Analytics />
       </body>
     </html>
   );

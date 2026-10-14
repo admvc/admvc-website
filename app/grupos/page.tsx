@@ -11,7 +11,7 @@ import type { Grupo } from '@/lib/types'
 export const metadata: Metadata = {
   title: "Pequenos Grupos",
   description:
-    "Encontre um pequeno grupo ADMVC perto de si. Comunidade, estudo biblico e crescimento juntos.",
+    "Encontre um pequeno grupo ADMVC perto de si. Comunidade, estudo bíblico e crescimento juntos.",
 }
 
 export const revalidate = 3600
@@ -64,17 +64,17 @@ export default async function GruposPublicosPage() {
                     Pequenos <span className="text-muted/30">Grupos.</span>
                 </h1>
                 <p className="text-sm text-muted font-medium max-w-lg mx-auto leading-relaxed">
-                    Encontre um grupo perto de si e faca parte de uma comunidade que se reune, estuda e cresce juntos.
+                    Encontre um grupo perto de si e faça parte de uma comunidade que se reúne, estuda e cresce juntos.
                 </p>
                 <div className="flex items-center justify-center gap-6 pt-2">
                     <div className="text-center">
                         <p className="text-2xl font-black italic text-fg">{grupos.length}</p>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-muted">Grupos Activos</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted">Grupos Ativos</p>
                     </div>
                     <div className="w-px h-8 bg-soft" />
                     <div className="text-center">
                         <p className="text-2xl font-black italic text-fg">{REGIOES.filter(r => (porRegiao[r] || []).length > 0).length}</p>
-                        <p className="text-[9px] font-black uppercase tracking-widest text-muted">Regioes</p>
+                        <p className="text-[9px] font-black uppercase tracking-widest text-muted">Regiões</p>
                     </div>
                     <div className="w-px h-8 bg-soft" />
                     <div className="text-center">
@@ -148,13 +148,13 @@ export default async function GruposPublicosPage() {
                                                 {grupo.dia_semana && grupo.horario && (
                                                     <div className="flex items-center gap-2 text-[10px] text-fg font-medium">
                                                         <Calendar size={12} className="text-figueira shrink-0" />
-                                                        {grupo.dia_semana} as {grupo.horario}
+                                                        {grupo.dia_semana} às {grupo.horario}
                                                     </div>
                                                 )}
-                                                {(grupo.endereco || grupo.cidade) && (
+                                                {(grupo.bairro || grupo.cidade) && (
                                                     <div className="flex items-center gap-2 text-[10px] text-muted">
                                                         <MapPin size={12} className="shrink-0" />
-                                                        {[grupo.bairro || grupo.endereco, grupo.cidade].filter(Boolean).join(', ')}
+                                                        {[grupo.bairro, grupo.cidade].filter(Boolean).join(', ')}
                                                     </div>
                                                 )}
                                                 <div className="flex items-center gap-2 text-[10px] text-muted">
@@ -182,7 +182,7 @@ export default async function GruposPublicosPage() {
                                                         }
                                                     </div>
                                                     <div>
-                                                        <p className="text-[9px] font-black uppercase tracking-widest text-muted leading-none">Lider</p>
+                                                        <p className="text-[9px] font-black uppercase tracking-widest text-muted leading-none">Líder</p>
                                                         <p className="text-[10px] font-black text-fg mt-0.5">
                                                             {lider.first_name} {lider.last_name}
                                                         </p>
@@ -201,7 +201,7 @@ export default async function GruposPublicosPage() {
                     <div className="py-20 text-center">
                         <Users size={32} className="mx-auto text-muted/20 mb-4" />
                         <p className="text-[10px] font-black uppercase tracking-widest text-muted">
-                            Nenhum grupo disponivel de momento
+                            Nenhum grupo disponível de momento
                         </p>
                     </div>
                 )}
@@ -210,10 +210,10 @@ export default async function GruposPublicosPage() {
             {/* CTA */}
             <section className="bg-figueira/5 border border-figueira/20 rounded-[2rem] p-8 md:p-12 text-center space-y-4">
                 <h2 className="text-2xl font-black uppercase italic tracking-tighter text-fg">
-                    Nao encontrou um grupo perto de si?
+                    Não encontrou um grupo perto de si?
                 </h2>
                 <p className="text-sm text-muted font-medium max-w-md mx-auto">
-                    Fale connosco — estamos a expandir para novas regioes e adorariamos ter a sua participacao.
+                    Fale connosco — estamos a expandir para novas regiões e adorariamos ter a sua participação.
                 </p>
                 <a href="/contato"
                     className="inline-flex items-center gap-2 bg-figueira text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-figueira/90 transition-all shadow-lg shadow-figueira/20 active:scale-95">

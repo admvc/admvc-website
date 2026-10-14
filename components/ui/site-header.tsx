@@ -14,10 +14,10 @@ export default function SiteHeader() {
   const [open, setOpen] = useState(false);
 
   const nav: NavItem[] = [
-    { href: "/", label: "Inicio" },
+    { href: "/", label: "Início" },
     { href: "/sobre", label: "Sobre" },
-    { href: "/congregacoes", label: "Congregacoes" },
-    { href: "/ministerios", label: "Ministerios" },
+    { href: "/congregacoes", label: "Congregações" },
+    { href: "/ministerios", label: "Ministérios" },
     { href: "/agenda", label: "Agenda" },
     { href: "/permanecer", label: "Permanecer" },
     { href: "/contato", label: "Contato" }
@@ -41,7 +41,7 @@ export default function SiteHeader() {
           </div>
           <div className="leading-tight">
             <div className="text-base font-semibold text-fg">{SITE_NAME}</div>
-            <div className="text-xs text-muted2">Figueira da Foz - Leiria - Barcelos</div>
+            <div className="text-xs text-muted2">Figueira da Foz - Montemor - Barcelos</div>
           </div>
         </Link>
 
@@ -57,7 +57,7 @@ export default function SiteHeader() {
         <div className="flex items-center gap-2">
           <a href={MEMBERS_AREA_URL} className="btn btn-primary hidden sm:inline-flex"
             target="_blank" rel="noopener noreferrer">
-            Area de Membros
+            Área de Membros
           </a>
           <button type="button" onClick={() => setOpen(v => !v)}
             className="md:hidden inline-flex items-center justify-center rounded-xl border border-soft bg-bg2 px-3 py-2 text-fg"
@@ -81,7 +81,7 @@ export default function SiteHeader() {
           </div>
           <a href={MEMBERS_AREA_URL} className="btn btn-primary w-full justify-center"
             target="_blank" rel="noopener noreferrer" onClick={() => setOpen(false)}>
-            Area de Membros
+            Área de Membros
           </a>
         </div>
       </div>

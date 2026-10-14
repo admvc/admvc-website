@@ -4,9 +4,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Ministerios",
+  title: "Ministérios",
   description:
-    "Ministerios da ADMVC — Infantil, Jovens, Louvor, Acao Social, Familia e Discipulado. Servir e parte da nossa missao.",
+    "Ministérios da ADMVC — Infantil, Jovens, Louvor, Ação Social, Família e Discipulado. Servir e parte da nossa missão.",
 };
 
 type Ministerio = {

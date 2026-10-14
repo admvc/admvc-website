@@ -1,7 +1,7 @@
 {
   "name": "ADMVC – Assembleia de Deus Ministério Visão de Conquista",
   "short_name": "ADMVC",
-  "description": "Mais que uma igreja, uma família. Sede na Figueira da Foz, com congregações em Leiria e Barcelos.",
+  "description": "Mais que uma igreja, uma família. Sede na Figueira da Foz, com congregações em Montemor e Barcelos.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

@@ -5,9 +5,9 @@ import Link from "next/link";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "Congregacoes",
+  title: "Congregações",
   description:
-    "Encontre a congregacao ADMVC mais perto de si — Figueira da Foz (Sede), Leiria e Barcelos. Horarios, enderecos e contactos.",
+    "Encontre a congregação ADMVC mais perto de si — Figueira da Foz (Sede), Montemor e Barcelos. Horários, endereços e contactos.",
 };
 
 type Congregacao = {
@@ -50,8 +50,8 @@ const CONGREGACOES: Congregacao[] = [
   },
   {
     badge: "Congregação",
-    cidade: "Leiria",
-    titulo: "Congregação — Leiria",
+    cidade: "Montemor",
+    titulo: "Congregação — Montemor",
     descricao:
       "Uma comunidade em crescimento, firmada na Palavra de Deus e em comunhão, servindo a cidade com fé e amor.",
     destaques: [
@@ -63,10 +63,8 @@ const CONGREGACOES: Congregacao[] = [
       { dia: "Domingo", hora: "—:—", nome: "Culto (em definição)" },
       { dia: "Semana", hora: "—:—", nome: "Reunião/Ensino (em definição)" }
     ],
-    endereco: "Estr. da Mata 93, 2415-557 Leiria",
+    // TODO: morada e link do mapa de Montemor
     contato: "A confirmar",
-    mapaUrl:
-      "https://www.google.com/maps/search/?api=1&query=Estr.%20da%20Mata%2093%2C%202415-557%20Leiria"
   },
   {
     badge: "Congregação",
@@ -113,7 +111,7 @@ export default function CongregacoesPage() {
 
           <p className="text-muted text-base md:text-lg">
             A ADMVC tem a <strong className="text-fg">Sede na Figueira da Foz</strong> como
-            principal, com congregações em <strong className="text-fg">Leiria</strong> e{" "}
+            principal, com congregações em <strong className="text-fg">Montemor</strong> e{" "}
             <strong className="text-fg">Barcelos</strong>.
           </p>
 

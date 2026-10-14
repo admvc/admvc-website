@@ -22,7 +22,7 @@ export default function ErrorPage({
 
       <h2 className="text-2xl font-bold text-fg">Algo correu mal</h2>
       <p className="text-sm text-muted max-w-md">
-        Pedimos desculpa pelo inconveniente. Pode tentar novamente ou voltar a pagina inicial.
+        Pedimos desculpa pelo inconveniente. Pode tentar novamente ou voltar a página inicial.
       </p>
 
       <div className="flex flex-wrap gap-3">
@@ -33,7 +33,7 @@ export default function ErrorPage({
           Tentar novamente
         </button>
         <Link href="/" className="btn btn-ghost">
-          Voltar ao inicio
+          Voltar ao início
         </Link>
       </div>
     </main>

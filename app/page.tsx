@@ -1,46 +1,35 @@
 // app/page.tsx
 import Link from "next/link";
-import { SITE_NAME, SITE_TAGLINE, CLOUD_API_URL, VIDEO_INSTITUCIONAL_URL } from "@/lib/constants";
-import type { DadosObra, EtapaConstrucao } from "@/lib/types";
+import { SITE_NAME, SITE_TAGLINE, CLOUD_API_URL, DOAR_URL, VIDEO_INSTITUCIONAL_URL } from "@/lib/constants";
+import type { DadosObra } from "@/lib/types";
+import { contasObra } from "@/lib/obra-tijolos";
+import IgrejaTijolos from "@/components/obra/IgrejaTijolos";
 
-// --- FETCH DA API CLOUD (COM PROTECAO CONTRA ERROS) ---
-async function getDadosObra() {
+const pc = (v: number) => (Math.round(v * 10) / 10).toLocaleString("pt-PT");
+
+// A obra vem do portal (financeiro → "A nossa obra"); os tijolos saem do dinheiro.
+// Se a API falhar, mostra a campanha sem tijolos pintados.
+async function getDadosObra(): Promise<DadosObra> {
   try {
-    const res = await fetch(`${CLOUD_API_URL}/api/public/obra`, {
-      next: { revalidate: 60 },
-    });
+    const res = await fetch(`${CLOUD_API_URL}/api/public/obra`, { next: { revalidate: 60 } });
     const json = await res.json();
-
-    if (json.ok && json.data) return json.data;
-  } catch (error) {
+    if (json.ok && json.data && json.data.valorTijolo) return json.data;
+  } catch {
     console.error("Aviso: Erro ao buscar dados da obra na API Cloud.");
   }
-
-  // FALLBACK DE SEGURANCA: Se a API falhar ou o projeto nao existir, mostra isto
   return {
-    titulo: "Campanha de Construcao: Nossa Sede",
-    descricao: "Acompanhe os passos de fe para a nossa sede na Figueira da Foz.",
-    objetivoFinal: 750000,
+    titulo: "Construção da nossa Igreja",
+    descricao: "Acompanhe os passos de fé para a nossa sede na Figueira da Foz.",
+    valorObra: 200000,
+    valorTijolo: 1000,
+    arrecadado: 0,
     videoUrl: VIDEO_INSTITUCIONAL_URL,
-    etapas: [
-      { nome: "1. Terreno", atual: 0, alvo: 150000 },
-      { nome: "2. Estrutura", atual: 0, alvo: 300000 },
-      { nome: "3. Acabamentos", atual: 0, alvo: 300000 }
-    ]
   };
 }
 
 export default async function HomePage() {
-  const DADOS_CONSTRUCAO = await getDadosObra();
-
-  // Calculos de Progresso (Valores usados apenas para a matematica, nao sao exibidos)
-  const etapas: EtapaConstrucao[] = DADOS_CONSTRUCAO.etapas || [];
-  const totalArrecadadoGeral = etapas.reduce((sum, etapa) => sum + (Number(etapa.atual) || 0), 0);
-  const objetivoFinal = Number(DADOS_CONSTRUCAO.objetivoFinal) || 0;
-
-  const porcentagemGeral = objetivoFinal > 0
-    ? Math.min(100, Math.round((totalArrecadadoGeral / objetivoFinal) * 100))
-    : 0;
+  const obra = await getDadosObra();
+  const tijolos = contasObra(obra);
 
   return (
     <main className="space-y-16 pb-16 animate-in fade-in duration-700">
@@ -62,26 +51,26 @@ export default async function HomePage() {
           <div className="max-w-3xl space-y-4">
             <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-black/35 px-3 py-1 text-xs text-white/90 backdrop-blur">
               <span className="h-2 w-2 rounded-full" style={{ backgroundColor: "var(--g-figueira)" }} />
-              {SITE_NAME} • Figueira da Foz · Leiria · Barcelos
+              {SITE_NAME} • Figueira da Foz · Montemor · Barcelos
             </div>
 
             <h1 className="text-3xl md:text-5xl font-semibold leading-tight text-white drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)]">
-              {SITE_TAGLINE.includes("uma familia") ? (
-                <>Mais que uma igreja, <span className="text-figueira drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)]">uma familia</span></>
+              {SITE_TAGLINE.includes("uma família") ? (
+                <>Mais que uma igreja, <span className="text-figueira drop-shadow-[0_2px_14px_rgba(0,0,0,0.85)]">uma família</span></>
               ) : (
                 <span className="text-figueira">{SITE_TAGLINE}</span>
               )}
             </h1>
 
             <p className="max-w-2xl text-base md:text-lg text-white/90 drop-shadow-[0_1px_8px_rgba(0,0,0,0.8)]">
-              Na ADMVC, voce encontra uma familia apaixonada por Jesus e por pessoas.
+              Na ADMVC, você encontra uma família apaixonada por Jesus e por pessoas.
               Acreditamos que todo filho de Deus pode ser cuidado e capacitado.
             </p>
 
             <div className="flex flex-wrap gap-3 pt-2">
               <Link href="/congregacoes" className="btn btn-primary">Visite-nos</Link>
               <Link href="/membros/dashboard" className="btn btn-ghost bg-black/35 text-white border-white/25 hover:bg-black/55">
-                🔒 Area de Membros
+                🔒 Área de Membros
               </Link>
               <Link href="/permanecer" className="btn btn-ghost bg-black/35 text-white border-white/25 hover:bg-black/55">
                 Permanecer
@@ -94,79 +83,67 @@ export default async function HomePage() {
       {/* 2. ESSENCIA */}
       <section className="space-y-6">
         <div className="space-y-2">
-          <h2 className="text-xl md:text-2xl font-semibold text-figueira">Jesus e o centro. Pessoas sao a missao.</h2>
-          <p className="text-muted max-w-3xl">A nossa fe e cristocentrica e a nossa pratica e servir e cuidar de pessoas.</p>
+          <h2 className="text-xl md:text-2xl font-semibold text-figueira">Jesus e o centro. Pessoas são a missão.</h2>
+          <p className="text-muted max-w-3xl">A nossa fé é cristocêntrica e a nossa prática é servir e cuidar de pessoas.</p>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <FeatureCard title="Cristo e o Centro" text="Jesus Cristo e o centro de tudo o que fazemos." reference="Cl 1:17-18" />
-          <FeatureCard title="Servico com Proposito" text="Servindo a Deus ao servir pessoas." reference="Mc 10:45 / Gl 5:13" />
+          <FeatureCard title="Serviço com Propósito" text="Servindo a Deus ao servir pessoas." reference="Mc 10:45 / Gl 5:13" />
           <FeatureCard title="Esperanca e Novo Comeco" text="Ha esperanca e um novo comeco em Cristo." reference="Jr 29:11" />
         </div>
       </section>
 
-      {/* 3. CONSTRUCAO DINAMICA (PUBLICA - APENAS PERCENTUAL) */}
-      <section className="relative overflow-hidden rounded-[3rem] border-2 border-figueira/30 bg-bg2 p-8 md:p-12 space-y-10 shadow-xl shadow-figueira/5">
+      {/* 3. A OBRA EM TIJOLOS (pública: tijolos e percentagem, sem valores em euros) */}
+      <section className="relative overflow-hidden rounded-[3rem] border-2 border-figueira/30 bg-bg2 p-8 md:p-12 shadow-xl shadow-figueira/5">
         <div className="absolute -top-24 -right-24 w-64 h-64 bg-figueira/5 rounded-full blur-3xl pointer-events-none" />
 
-        <div className="relative z-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-figueira text-white text-[10px] font-black uppercase tracking-widest mb-2 shadow-lg shadow-figueira/20">
-              Passos de Fe • Campanha Ativa
+        <div className="relative z-10 grid gap-10 md:grid-cols-2 md:items-center">
+          <div className="space-y-6">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-figueira text-white text-[10px] font-black uppercase tracking-widest shadow-lg shadow-figueira/20">
+              Passos de Fé • Campanha Ativa
             </div>
-            <h2 className="text-3xl md:text-4xl font-black italic text-fg tracking-tighter uppercase leading-none">{DADOS_CONSTRUCAO.titulo}</h2>
-            <p className="text-sm text-muted font-bold tracking-widest uppercase max-w-xl leading-relaxed">{DADOS_CONSTRUCAO.descricao}</p>
-          </div>
+            <h2 className="text-3xl md:text-4xl font-black italic text-fg tracking-tighter uppercase leading-none">{obra.titulo}</h2>
+            <p className="text-muted leading-relaxed max-w-xl">{obra.chamada || obra.descricao}</p>
 
-          <div className="flex flex-wrap items-center gap-4 shrink-0">
-            {DADOS_CONSTRUCAO.videoUrl && (
-              <a href={DADOS_CONSTRUCAO.videoUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-2xl bg-fg text-bg px-8 py-4 text-[10px] font-black uppercase tracking-widest hover:scale-105 transition-all shadow-lg active:scale-95">
-                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
-                Assista ao Projeto
-              </a>
-            )}
-
-            <div className="flex flex-col items-center justify-center rounded-2xl border-2 border-figueira/20 bg-figueira/5 px-8 py-4 min-w-[140px]">
-              <span className="text-[10px] text-figueira font-black uppercase tracking-[0.2em] opacity-80">Progresso Geral</span>
-              <span className="text-4xl font-black italic text-figueira leading-none">{porcentagemGeral}%</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Grid de Etapas Ocultando Valores Financeiros */}
-        <div className="relative z-10 grid gap-6 md:grid-cols-3">
-          {DADOS_CONSTRUCAO.etapas?.map((etapa: EtapaConstrucao, index: number) => {
-            const alvoSeguro = etapa.alvo > 0 ? etapa.alvo : 1;
-            const porcentagemEtapa = Math.min(100, Math.round(((etapa.atual || 0) / alvoSeguro) * 100));
-            const concluido = porcentagemEtapa >= 100;
-
-            return (
-              <div key={index} className={`space-y-5 rounded-[2rem] border p-6 transition-all duration-300 ${concluido ? 'bg-green-500/5 border-green-500/20' : 'bg-bg border-soft hover:border-figueira/30 hover:shadow-lg'}`}>
-                <div className="flex justify-between items-start">
-                  <h3 className={`font-black text-sm uppercase tracking-tight w-2/3 leading-tight ${concluido ? 'text-green-600' : 'text-fg'}`}>{etapa.nome}</h3>
-                  <span className={`text-2xl font-black italic ${concluido ? 'text-green-500' : 'text-figueira'}`}>
-                    {porcentagemEtapa}%
-                  </span>
-                </div>
-
-                <div className="relative h-2 w-full rounded-full bg-soft overflow-hidden shadow-inner">
-                  <div
-                    className={`absolute inset-y-0 left-0 rounded-full transition-all duration-1000 ease-out ${concluido
-                      ? 'bg-green-500 shadow-[0_0_10px_rgba(34,197,94,0.4)]'
-                      : 'bg-figueira shadow-[0_0_10px_rgba(63,107,79,0.4)]'
-                      }`}
-                    style={{ width: `${porcentagemEtapa}%` }}
-                  />
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <span className={`h-2.5 w-2.5 rounded-full ${concluido ? 'bg-green-500' : 'bg-figueira animate-pulse'}`} />
-                  <p className={`text-[9px] font-black uppercase tracking-wider ${concluido ? 'text-green-600' : 'text-muted'}`}>
-                    {concluido ? "Fase Concluida" : "Fase em Andamento"}
-                  </p>
-                </div>
+            <div className="flex gap-8">
+              <div>
+                <p className="text-4xl md:text-5xl font-black italic leading-none" style={{ color: "#C1663A" }}>{tijolos.colocados}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted mt-1">Tijolos colocados</p>
               </div>
-            );
-          })}
+              <div>
+                <p className="text-4xl md:text-5xl font-black italic leading-none text-fg">{tijolos.faltam}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted mt-1">Ainda faltam</p>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <div className="relative h-2 w-full rounded-full overflow-hidden" style={{ background: "rgba(128,128,128,.25)" }}>
+                <div className="absolute inset-y-0 left-0 rounded-full" style={{ width: `${tijolos.pct}%`, background: "#C1663A" }} />
+              </div>
+              <p className="text-sm font-bold text-fg">
+                {tijolos.pct >= 100 ? "Obra financiada! Obrigado." : `${pc(tijolos.pct)}% da obra · cada tijolo conta`}
+              </p>
+            </div>
+
+            <div className="flex flex-wrap gap-3">
+              <a href={DOAR_URL} target="_blank" rel="noopener noreferrer" className="btn btn-primary">
+                Contribuir
+              </a>
+              {obra.videoUrl && (
+                <a href={obra.videoUrl} target="_blank" rel="noopener noreferrer" className="btn btn-ghost">
+                  Ver o projeto
+                </a>
+              )}
+            </div>
+
+            {obra.versiculo && (
+              <blockquote className="text-sm italic text-muted border-l-2 border-figueira/40 pl-4">
+                “{obra.versiculo}”{obra.versiculoRef && <span className="not-italic font-bold"> — {obra.versiculoRef}</span>}
+              </blockquote>
+            )}
+          </div>
+
+          <IgrejaTijolos colocados={tijolos.colocados} total={tijolos.total} className="w-full max-w-md mx-auto text-fg order-first md:order-last" />
         </div>
       </section>
 
@@ -176,14 +153,14 @@ export default async function HomePage() {
           <h2 className="text-xl md:text-2xl font-semibold text-figueira">Quem somos</h2>
 
           <p className="text-muted">
-            A Assembleia de Deus – Ministerio Visao de Conquista e uma igreja crista comprometida
-            com a Palavra de Deus, com a familia e com a transformacao de vidas por meio do
+            A Assembleia de Deus – Ministério Visão de Conquista é uma igreja cristã comprometida
+            com a Palavra de Deus, com a família e com a transformação de vidas por meio do
             Evangelho de Jesus Cristo.
           </p>
 
           <p className="text-muted">
             Acreditamos que todo filho de Deus pode ser cuidado e capacitado. Depois de passar
-            por esse processo, torna-se apto a gerar transformacao e levar as Boas Novas a todo o
+            por esse processo, torna-se apto a gerar transformação e levar as Boas Novas a todo o
             mundo, como a Biblia nos ordena.
           </p>
 
@@ -197,7 +174,7 @@ export default async function HomePage() {
         <div className="md:col-span-7 grid gap-4 md:grid-cols-2">
           <FeatureCard title="Acolhimento" desc="Uma comunidade que recebe, cuida e caminha junto." />
           <FeatureCard title="Discipulado" desc="Crescimento espiritual com base na Palavra de Deus." />
-          <FeatureCard title="Servico" desc="Servir e parte da nossa cultura crista e comunitaria." />
+          <FeatureCard title="Serviço" desc="Servir e parte da nossa cultura crista e comunitaria." />
           <FeatureCard title="Unidade" desc="Mais que uma igreja, uma familia — em amor e comunhao." />
         </div>
       </section>
@@ -207,19 +184,19 @@ export default async function HomePage() {
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-xl md:text-2xl font-semibold text-figueira">
-              Nossas Congregacoes
+              Nossas Congregações
             </h2>
-            <p className="text-muted">Sede como principal, com congregacoes em Leiria e Barcelos.</p>
+            <p className="text-muted">Sede como principal, com congregações em Montemor e Barcelos.</p>
           </div>
           <Link href="/congregacoes" className="text-figueira underline underline-offset-4">
-            Ver horarios e enderecos
+            Ver horários e endereços
           </Link>
         </div>
 
         <div className="grid gap-4 md:grid-cols-3">
           <PlaceCard badge="Sede" title="Figueira da Foz" desc="Cultos e encontros semanais" accent="figueira" />
-          <PlaceCard badge="Congregacao" title="Leiria" desc="Uma comunidade em crescimento" accent="soft" />
-          <PlaceCard badge="Congregacao" title="Barcelos" desc="Caminhando juntos em fe" accent="deep" />
+          <PlaceCard badge="Congregação" title="Montemor" desc="Uma comunidade em crescimento" accent="soft" />
+          <PlaceCard badge="Congregação" title="Barcelos" desc="Caminhando juntos em fé" accent="deep" />
         </div>
       </section>
 
@@ -228,10 +205,10 @@ export default async function HomePage() {
         <div className="flex flex-col gap-2 md:flex-row md:items-end md:justify-between">
           <div>
             <h2 className="text-xl md:text-2xl font-semibold text-figueira">Vida na Igreja</h2>
-            <p className="text-muted">Ministerios que fortalecem a fe, a comunhao e o servico.</p>
+            <p className="text-muted">Ministérios que fortalecem a fe, a comunhão e o serviço.</p>
           </div>
           <Link href="/ministerios" className="text-figueira underline underline-offset-4">
-            Conheca nossos ministerios
+            Conheca nossos ministérios
           </Link>
         </div>
 
@@ -240,7 +217,7 @@ export default async function HomePage() {
           <MiniCard title="Jovens" />
           <MiniCard title="Louvor" />
           <MiniCard title="Acao Social" />
-          <MiniCard title="Familia" />
+          <MiniCard title="Família" />
           <MiniCard title="Discipulado" />
         </div>
       </section>
@@ -255,9 +232,9 @@ export default async function HomePage() {
 
       {/* 8. CALLOUTS FINAIS */}
       <section className="grid gap-4 md:grid-cols-2">
-        <Callout title="Quer tornar-se membro?" desc="O Permanecer e o caminho para se integrar a nossa familia." ctaLabel="Saber mais" ctaHref="/permanecer" variant="soft" />
+        <Callout title="Quer tornar-se membro?" desc="O Permanecer e o caminho para se integrar a nossa família." ctaLabel="Saber mais" ctaHref="/permanecer" variant="soft" />
         <Callout
-          title="Area de Membros"
+          title="Área de Membros"
           desc="Acesso exclusivo para membros da ADMVC. Entre para acompanhar as suas escalas e comunicados."
           ctaLabel="Entrar"
           ctaHref="/membros/dashboard"
@@ -325,7 +302,7 @@ function MiniCard({ title }: { title: string }) {
         <h3 className="font-semibold text-fg">{title}</h3>
         <span className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: "var(--g-figueira)" }} />
       </div>
-      <p className="mt-2 text-sm text-muted">Conteudo e atividades voltadas para edificacao e comunhao.</p>
+      <p className="mt-2 text-sm text-muted">Conteúdo e atividades voltadas para edificação e comunhão.</p>
     </div>
   );
 }

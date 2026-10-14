@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Sobre",
   description:
-    "Conheca a ADMVC — Assembleia de Deus Ministerio Visao de Conquista. A nossa missao, visao e valores.",
+    "Conheca a ADMVC — Assembleia de Deus Ministério Visão de Conquista. A nossa missão, visão e valores.",
 };
 
 export default function SobrePage() {

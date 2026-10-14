@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: ['/membros/', '/api/'],
     },
-    sitemap: 'https://igrejaadmvc.org/sitemap.xml',
+    sitemap: 'https://www.igrejaadmvc.org/sitemap.xml',
   }
 }

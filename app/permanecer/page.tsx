@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Permanecer",
   description:
-    "O processo Permanecer e o caminho para se integrar a membresia da ADMVC — conhecer a visao, alinhar e comprometer-se.",
+    "O processo Permanecer e o caminho para se integrar a membresia da ADMVC — conhecer a visão, alinhar e comprometer-se.",
 };
 
 export default function PermanecerPage() {

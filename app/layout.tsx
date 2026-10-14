@@ -12,8 +12,8 @@ export const metadata: Metadata = {
     template: `%s | ${SITE_NAME}`,
   },
   description:
-    "Assembleia de Deus - Ministerio Visao de Conquista. Uma igreja acolhedora, comunitaria e centrada na Palavra de Deus.",
-  metadataBase: new URL("https://igrejaadmvc.org"),
+    "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
+  metadataBase: new URL("https://www.igrejaadmvc.org"),
   manifest: "/site.webmanifest",
   icons: {
     icon: [
@@ -26,18 +26,18 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "pt_PT",
-    url: "https://igrejaadmvc.org",
+    url: "https://www.igrejaadmvc.org",
     siteName: SITE_NAME,
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description:
-      "Assembleia de Deus - Ministerio Visao de Conquista. Uma igreja acolhedora, comunitaria e centrada na Palavra de Deus.",
-    images: [{ url: "/images/hero_teste.png", width: 1200, height: 630, alt: "ADMVC - Mais que uma igreja, uma familia" }],
+      "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
+    images: [{ url: "/images/hero_teste.png", width: 1200, height: 630, alt: "ADMVC - Mais que uma igreja, uma família" }],
   },
   twitter: {
     card: "summary_large_image",
     title: `${SITE_NAME} | ${SITE_TAGLINE}`,
     description:
-      "Assembleia de Deus - Ministerio Visao de Conquista. Uma igreja acolhedora, comunitaria e centrada na Palavra de Deus.",
+      "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
     images: ["/images/hero_teste.png"],
   },
 };
@@ -53,9 +53,9 @@ const jsonLd = {
   "@type": "Church",
   name: "ADMVC - Assembleia de Deus Ministerio Visao de Conquista",
   alternateName: "ADMVC",
-  url: "https://igrejaadmvc.org",
+  url: "https://www.igrejaadmvc.org",
   description:
-    "Assembleia de Deus - Ministerio Visao de Conquista. Uma igreja acolhedora, comunitaria e centrada na Palavra de Deus.",
+    "Assembleia de Deus - Ministério Visão de Conquista. Uma igreja acolhedora, comunitária e centrada na Palavra de Deus.",
   address: {
     "@type": "PostalAddress",
     streetAddress: "R. Antonio Pestana Rato 77",

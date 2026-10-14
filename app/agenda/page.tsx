@@ -6,7 +6,7 @@ import type { Metadata } from "next";
 export const metadata: Metadata = {
   title: "Agenda Semanal",
   description:
-    "Agenda semanal da ADMVC — cultos, ensino, discipulado e comunhao. Consulte os horarios da Sede e das congregacoes.",
+    "Agenda semanal da ADMVC — cultos, ensino, discipulado e comunhão. Consulte os horários da Sede e das congregações.",
 };
 
 type Evento = {
@@ -17,7 +17,7 @@ type Evento = {
   badge?: string;
 };
 
-type UnidadeKey = "sede" | "leiria" | "barcelos";
+type UnidadeKey = "sede" | "montemor" | "barcelos";
 
 const SEDE_SEMANAL: Evento[] = [
   {
@@ -61,13 +61,13 @@ const SEDE_SEMANAL: Evento[] = [
 
 const UNIDADES: { key: UnidadeKey; label: string; sub: string }[] = [
   { key: "sede", label: "Sede", sub: "Figueira da Foz" },
-  { key: "leiria", label: "Congregação", sub: "Leiria" },
+  { key: "montemor", label: "Congregação", sub: "Montemor" },
   { key: "barcelos", label: "Congregação", sub: "Barcelos" }
 ];
 
 function normalizeUnidade(v?: string): UnidadeKey {
   const x = (v || "").toLowerCase();
-  if (x === "leiria") return "leiria";
+  if (x === "montemor") return "montemor";
   if (x === "barcelos") return "barcelos";
   return "sede";
 }

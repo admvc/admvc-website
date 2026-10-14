@@ -1,7 +1,7 @@
 import type { MetadataRoute } from 'next'
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://igrejaadmvc.org'
+  const baseUrl = 'https://www.igrejaadmvc.org'
 
   return [
     {

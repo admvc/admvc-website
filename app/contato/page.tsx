@@ -5,7 +5,7 @@ import { useActionState } from 'react'
 import Link from "next/link";
 import { Loader2, Send, CheckCircle2 } from "lucide-react";
 import { enviarContacto } from '@/app/actions'
-import { CONTACT_EMAIL, SEDE_ENDERECO, SEDE_MAPS_URL } from '@/lib/constants'
+import { CONTACT_EMAIL, PRIVACIDADE_URL, SEDE_ENDERECO, SEDE_MAPS_URL } from '@/lib/constants'
 import type { FormState } from '@/lib/types'
 
 const initialState: FormState = { success: false }
@@ -34,13 +34,13 @@ export default function ContatoPage() {
           </h1>
 
           <p className="text-muted text-base md:text-lg font-medium max-w-xl">
-            Estamos a disposicao para orar consigo, esclarecer duvidas ou orientar a sua primeira
-            visita a nossa igreja.
+            Estamos à disposição para orar consigo, esclarecer dúvidas ou orientar a sua primeira
+            visita à nossa igreja.
           </p>
 
           <div className="flex flex-wrap gap-3 pt-4">
             <Link href="/congregacoes" className="btn btn-primary">
-              Ver congregacoes
+              Ver congregações
             </Link>
             <Link href="/agenda" className="btn btn-ghost">
               Ver agenda
@@ -93,13 +93,14 @@ export default function ContatoPage() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label htmlFor="contato-telefone" className="text-[9px] font-black uppercase text-muted tracking-widest ml-4">Telemovel (Opcional)</label>
+                    <label htmlFor="contato-telefone" className="text-[9px] font-black uppercase text-muted tracking-widest ml-4">Telemóvel</label>
                     <input
                       id="contato-telefone"
                       type="tel"
                       name="telefone"
+                      required
                       className="w-full bg-bg border border-soft rounded-2xl p-4 text-sm font-bold text-fg focus:border-figueira outline-none shadow-sm transition-all"
-                      placeholder="O teu numero..."
+                      placeholder="O teu número..."
                     />
                   </div>
                 </div>
@@ -124,18 +125,23 @@ export default function ContatoPage() {
                     rows={5}
                     required
                     className="w-full bg-bg border border-soft rounded-2xl p-4 text-sm font-bold text-fg focus:border-figueira outline-none shadow-sm transition-all resize-none custom-scrollbar"
-                    placeholder="Escreve aqui a tua duvida, pedido de oracao ou mensagem..."
+                    placeholder="Escreve aqui a tua duvida, pedido de oração ou mensagem..."
                   />
                 </div>
+
+                <label htmlFor="contato-consentimento" className="flex items-start gap-3 px-1 text-xs font-medium text-muted leading-relaxed cursor-pointer">
+                  <input id="contato-consentimento" type="checkbox" name="consentimento" required className="mt-0.5 h-4 w-4 shrink-0 accent-[#3f6b4f]" />
+                  <span>
+                    Aceito que a ADMVC guarde estes dados para me contactar.{' '}
+                    <a href={PRIVACIDADE_URL} target="_blank" rel="noopener noreferrer" className="text-figueira underline underline-offset-2">Política de privacidade</a>
+                  </span>
+                </label>
 
                 <button disabled={pending} type="submit" className="w-full flex items-center justify-center gap-2 bg-figueira text-white py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:brightness-110 transition-all shadow-xl shadow-figueira/20 active:scale-95 disabled:opacity-50 mt-2">
                   {pending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
                   {pending ? 'A enviar...' : 'Enviar Mensagem'}
                 </button>
 
-                <p className="text-[9px] font-bold text-muted uppercase tracking-widest text-center pt-2">
-                  Ao enviar, concordas em ser contactado pela nossa equipa de acolhimento.
-                </p>
               </form>
             </>
           )}
@@ -171,13 +177,13 @@ export default function ContatoPage() {
           <div className="rounded-[2.5rem] border border-soft bg-bg2 p-8 shadow-sm flex-1">
             <h3 className="text-lg font-black italic uppercase tracking-tighter text-fg mb-2">Primeira visita?</h3>
             <p className="text-xs font-medium text-muted leading-relaxed mb-6">
-              Se quiser, fale connosco antes e ajudamos a orientar o melhor dia e horario para a
+              Se quiser, fale connosco antes e ajudamos a orientar o melhor dia e horário para a
               sua visita.
             </p>
 
             <div className="flex flex-col gap-3">
               <Link href="/agenda" className="bg-bg border border-soft text-center text-fg px-6 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-soft transition-all active:scale-95">
-                Ver horarios
+                Ver horários
               </Link>
               <Link href="/congregacoes" className="bg-bg border border-soft text-center text-fg px-6 py-3.5 rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-soft transition-all active:scale-95">
                 Descobrir moradas

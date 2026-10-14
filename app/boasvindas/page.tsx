@@ -4,7 +4,7 @@
 import { useActionState } from 'react'
 import { HeartHandshake, Sparkles, Send, CheckCircle2, Loader2, PlayCircle } from 'lucide-react'
 import { enviarVisitante } from '@/app/actions'
-import { VIDEO_INSTITUCIONAL_URL } from '@/lib/constants'
+import { PRIVACIDADE_URL, VIDEO_INSTITUCIONAL_URL } from '@/lib/constants'
 import type { FormState } from '@/lib/types'
 
 const initialState: FormState = { success: false }
@@ -23,7 +23,7 @@ export default function BemVindoPage() {
                         Que bom ter-te <br /><span className="text-figueira">connosco!</span>
                     </h1>
                     <p className="text-muted text-sm uppercase tracking-widest font-bold max-w-sm mx-auto leading-relaxed">
-                        Recebemos os teus dados e o teu pedido de oracao. Se muito bem-vindo, volta sempre, ou melhor... <span className="text-fg font-black">fica para sempre!</span>
+                        Recebemos os teus dados e o teu pedido de oração. Sê muito bem-vindo, volta sempre, ou melhor... <span className="text-fg font-black">fica para sempre!</span>
                     </p>
 
                     <a
@@ -52,10 +52,10 @@ export default function BemVindoPage() {
                             <HeartHandshake size={32} />
                         </div>
                         <h1 className="text-3xl font-black italic uppercase tracking-tighter text-fg leading-none">
-                            Bem-vindo a <br /> nossa casa.
+                            Bem-vindo à <br /> nossa casa.
                         </h1>
                         <p className="text-[11px] text-muted font-bold uppercase tracking-widest pt-2 leading-relaxed">
-                            Se muito bem-vindo! Volta sempre, ou melhor... <span className="text-figueira font-black">fica para sempre!</span>
+                            Sê muito bem-vindo! Volta sempre, ou melhor... <span className="text-figueira font-black">fica para sempre!</span>
                         </p>
                     </div>
 
@@ -73,16 +73,24 @@ export default function BemVindoPage() {
                         </div>
 
                         <div className="space-y-1.5">
-                            <label htmlFor="telefone-visitante" className="text-[9px] font-black uppercase text-muted tracking-widest ml-4">Telemovel / WhatsApp</label>
+                            <label htmlFor="telefone-visitante" className="text-[9px] font-black uppercase text-muted tracking-widest ml-4">Telemóvel / WhatsApp</label>
                             <input id="telefone-visitante" name="telefone" type="tel" required placeholder="O teu contacto..." className="w-full bg-bg border border-soft rounded-2xl p-4 text-sm font-bold text-fg focus:border-figueira outline-none shadow-sm transition-all" />
                         </div>
 
                         <div className="space-y-1.5">
                             <label htmlFor="pedido-oracao" className="text-[9px] font-black uppercase text-muted tracking-widest ml-4 flex items-center gap-2">
-                                Pedido de Oracao <Sparkles size={10} className="text-figueira" />
+                                Pedido de Oração <Sparkles size={10} className="text-figueira" />
                             </label>
                             <textarea id="pedido-oracao" name="pedido_oracao" rows={3} placeholder="Como podemos orar por ti hoje? (Opcional)" className="w-full bg-bg border border-soft rounded-2xl p-4 text-sm font-bold text-fg focus:border-figueira outline-none shadow-sm transition-all resize-none"></textarea>
                         </div>
+
+                        <label htmlFor="visitante-consentimento" className="flex items-start gap-3 px-1 text-xs font-medium text-muted leading-relaxed cursor-pointer">
+                          <input id="visitante-consentimento" type="checkbox" name="consentimento" required className="mt-0.5 h-4 w-4 shrink-0 accent-[#3f6b4f]" />
+                          <span>
+                            Aceito que a ADMVC guarde estes dados para me contactar.{' '}
+                            <a href={PRIVACIDADE_URL} target="_blank" rel="noopener noreferrer" className="text-figueira underline underline-offset-2">Política de privacidade</a>
+                          </span>
+                        </label>
 
                         <button disabled={pending} type="submit" className="w-full flex items-center justify-center gap-2 bg-fg text-bg py-5 rounded-2xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-figueira hover:text-white transition-all shadow-xl active:scale-95 disabled:opacity-50 mt-4">
                             {pending ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
@@ -98,7 +106,7 @@ export default function BemVindoPage() {
                             className="inline-flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-figueira hover:text-fg transition-colors"
                         >
                             <PlayCircle size={14} />
-                            Assiste ao video da nossa Igreja
+                            Assiste ao vídeo da nossa Igreja
                         </a>
                     </div>
                 </div>

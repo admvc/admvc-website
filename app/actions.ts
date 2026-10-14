@@ -16,10 +16,14 @@ export async function enviarVisitante(
   }
 
   if (!telefone || typeof telefone !== 'string' || telefone.trim().length < 5) {
-    return { success: false, error: 'Por favor, insira um contacto valido.' }
+    return { success: false, error: 'Por favor, insira um contacto válido.' }
   }
 
-  const pedido_oracao = `\u{1F331} [NOVO VISITANTE]\n${pedido_oracao_raw?.trim() || 'Sem pedido especifico.'}`
+  if (formData.get('consentimento') !== 'on') {
+    return { success: false, error: 'Para enviar, aceite que a ADMVC guarde os seus dados para o contactar.' }
+  }
+
+  const pedido_oracao = `\u{1F331} [NOVO VISITANTE]\n${pedido_oracao_raw?.trim() || 'Sem pedido específico.'}`
 
   try {
     const res = await fetch(`${CLOUD_API_URL}/api/public/visitante`, {
@@ -29,6 +33,7 @@ export async function enviarVisitante(
         nome: nome.trim(),
         telefone: telefone.trim(),
         pedido_oracao,
+        consentimento: true,
       }),
     })
 
@@ -44,7 +49,7 @@ export async function enviarVisitante(
 
     return { success: false, error: data.error || 'Ocorreu um erro ao enviar. Tente novamente.' }
   } catch {
-    return { success: false, error: 'Erro de ligacao. Verifique a sua internet e tente novamente.' }
+    return { success: false, error: 'Erro de ligação. Verifique a sua internet e tente novamente.' }
   }
 }
 
@@ -62,11 +67,19 @@ export async function enviarContacto(
   }
 
   if (!email || typeof email !== 'string' || !email.includes('@')) {
-    return { success: false, error: 'Por favor, insira um e-mail valido.' }
+    return { success: false, error: 'Por favor, insira um e-mail válido.' }
   }
 
   if (!message || typeof message !== 'string' || message.trim().length < 3) {
     return { success: false, error: 'Por favor, escreva uma mensagem.' }
+  }
+
+  if (!telefone || telefone.trim().length < 5) {
+    return { success: false, error: 'Por favor, insira o seu telemóvel.' }
+  }
+
+  if (formData.get('consentimento') !== 'on') {
+    return { success: false, error: 'Para enviar, aceite que a ADMVC guarde os seus dados para o contactar.' }
   }
 
   const textoFormatado = `\u{2709}\u{FE0F} [CONTACTO SITE]\nE-mail: ${email.trim()}\n\n${message.trim()}`
@@ -77,8 +90,9 @@ export async function enviarContacto(
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         nome: nome.trim(),
-        telefone: telefone?.trim() || undefined,
+        telefone: telefone.trim(),
         pedido_oracao: textoFormatado,
+        consentimento: true,
       }),
     })
 
@@ -94,6 +108,6 @@ export async function enviarContacto(
 
     return { success: false, error: data.error || 'Ocorreu um erro ao enviar. Tente novamente.' }
   } catch {
-    return { success: false, error: 'Erro de ligacao. Verifique a sua internet e tente novamente.' }
+    return { success: false, error: 'Erro de ligação. Verifique a sua internet e tente novamente.' }
   }
 }

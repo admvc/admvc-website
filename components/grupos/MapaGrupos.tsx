@@ -3,24 +3,8 @@
 // Importado com dynamic({ ssr: false }) nas páginas que o usam
 
 import { useEffect } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap } from 'react-leaflet'
-import type { Map as LeafletMap } from 'leaflet'
+import { MapContainer, TileLayer, Circle, Polygon, Popup, useMap } from 'react-leaflet'
 import 'leaflet/dist/leaflet.css'
-
-// Fix do ícone padrão do Leaflet no Next.js
-// (o webpack não copia os assets automaticamente)
-function fixLeafletIcons() {
-    if (typeof window === 'undefined') return
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const L = require('leaflet')
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    delete (L.Icon.Default.prototype as any)._getIconUrl
-    L.Icon.Default.mergeOptions({
-        iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-        iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-        shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-    })
-}
 
 // Cores por região
 const COR_REGIAO: Record<string, string> = {
@@ -31,36 +15,18 @@ const COR_REGIAO: Record<string, string> = {
     Online: '#6b7280',
 }
 
-function criarIconeColorido(cor: string) {
-    if (typeof window === 'undefined') return undefined
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const L = require('leaflet')
-    return L.divIcon({
-        html: `
-            <div style="
-                width: 28px; height: 28px;
-                background: ${cor};
-                border: 3px solid white;
-                border-radius: 50% 50% 50% 0;
-                transform: rotate(-45deg);
-                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-            "></div>
-        `,
-        className: '',
-        iconSize: [28, 28],
-        iconAnchor: [14, 28],
-        popupAnchor: [0, -32],
-    })
-}
+// O site nunca mostra onde fica a casa: só a zona desenhada no portal ou,
+// sem ela, um círculo à volta de um ponto já arredondado pela API.
+const RAIO_ZONA_M = 1000
 
-// Ajusta o mapa para mostrar todos os marcadores
+// Ajusta o mapa para mostrar todas as zonas
 function FitBounds({ grupos }: { grupos: Grupo[] }) {
     const map = useMap()
     useEffect(() => {
         const comCoords = grupos.filter((g): g is Grupo & { latitude: number; longitude: number } => g.latitude != null && g.longitude != null)
         if (comCoords.length === 0) return
         if (comCoords.length === 1) {
-            map.setView([comCoords[0].latitude, comCoords[0].longitude], 13)
+            map.setView([comCoords[0].latitude, comCoords[0].longitude], 14)
             return
         }
         // eslint-disable-next-line @typescript-eslint/no-require-imports
@@ -80,8 +46,6 @@ interface Props {
 }
 
 export default function MapaGrupos({ grupos, altura = '500px', mostrarLegenda = true }: Props) {
-    fixLeafletIcons()
-
     const gruposComCoords = grupos.filter(g => g.latitude && g.longitude)
     const centro: [number, number] = [39.6, -8.0] // Centro de Portugal
 
@@ -105,48 +69,46 @@ export default function MapaGrupos({ grupos, altura = '500px', mostrarLegenda = 
 
                 {gruposComCoords.map(g => {
                     const cor = COR_REGIAO[g.regiao || ''] || '#6b7280'
-                    const icone = criarIconeColorido(cor)
                     const lider = g.lideres?.[0]
+                    const estilo = { color: cor, fillColor: cor, fillOpacity: 0.2, weight: 2 }
 
-                    return (
-                        <Marker
-                            key={g.id}
-                            position={[g.latitude!, g.longitude!]}
-                            icon={icone}
-                        >
-                            <Popup minWidth={200}>
-                                <div className="space-y-1.5 py-1">
-                                    <p className="font-black text-sm uppercase leading-tight">{g.nome}</p>
-                                    {g.regiao && (
-                                        <span style={{ background: cor }}
-                                            className="inline-block text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
-                                            {g.regiao}
-                                        </span>
-                                    )}
-                                    {g.dia_semana && g.horario && (
-                                        <p className="text-xs text-gray-600">
-                                            📅 {g.dia_semana} às {g.horario}
-                                        </p>
-                                    )}
-                                    {(g.endereco || g.cidade) && (
-                                        <p className="text-xs text-gray-500">
-                                            📍 {[g.endereco, g.cidade].filter(Boolean).join(', ')}
-                                        </p>
-                                    )}
-                                    {lider && (
-                                        <p className="text-xs text-gray-600">
-                                            👤 {lider.first_name} {lider.last_name}
-                                        </p>
-                                    )}
-                                    {g.descricao && (
-                                        <p className="text-xs text-gray-500 italic border-t pt-1 mt-1">
-                                            {g.descricao}
-                                        </p>
-                                    )}
-                                </div>
-                            </Popup>
-                        </Marker>
+                    const popup = (
+                        <Popup minWidth={200}>
+                            <div className="space-y-1.5 py-1">
+                                <p className="font-black text-sm uppercase leading-tight">{g.nome}</p>
+                                {g.regiao && (
+                                    <span style={{ background: cor }}
+                                        className="inline-block text-white text-[9px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full">
+                                        {g.regiao}
+                                    </span>
+                                )}
+                                {g.dia_semana && g.horario && (
+                                    <p className="text-xs text-gray-600">
+                                        📅 {g.dia_semana} às {g.horario}
+                                    </p>
+                                )}
+                                {(g.bairro || g.cidade) && (
+                                    <p className="text-xs text-gray-500">
+                                        📍 Zona de {[g.bairro, g.cidade].filter(Boolean).join(', ')}
+                                    </p>
+                                )}
+                                {lider && (
+                                    <p className="text-xs text-gray-600">
+                                        👤 {lider.first_name} {lider.last_name}
+                                    </p>
+                                )}
+                                {g.descricao && (
+                                    <p className="text-xs text-gray-500 italic border-t pt-1 mt-1">
+                                        {g.descricao}
+                                    </p>
+                                )}
+                            </div>
+                        </Popup>
                     )
+
+                    return g.area
+                        ? <Polygon key={g.id} positions={g.area} pathOptions={estilo}>{popup}</Polygon>
+                        : <Circle key={g.id} center={[g.latitude!, g.longitude!]} radius={RAIO_ZONA_M} pathOptions={estilo}>{popup}</Circle>
                 })}
             </MapContainer>
 

@@ -1,20 +1,17 @@
 // lib/types.ts
 // Tipos partilhados pelo site
 
-/** Etapa de construcao retornada pela API /api/public/obra */
-export interface EtapaConstrucao {
-  nome: string;
-  atual: number;
-  alvo: number;
-}
-
-/** Dados da obra/campanha retornados pela API */
+/** A campanha da obra (API /api/public/obra): os tijolos calculam-se no site */
 export interface DadosObra {
   titulo: string;
   descricao: string;
-  objetivoFinal: number;
-  videoUrl?: string;
-  etapas: EtapaConstrucao[];
+  chamada?: string | null;
+  versiculo?: string | null;
+  versiculoRef?: string | null;
+  videoUrl?: string | null;
+  valorObra: number;
+  valorTijolo: number;
+  arrecadado: number;
 }
 
 /** Lider de grupo retornado pela API */
@@ -30,16 +27,17 @@ export interface Grupo {
   nome: string;
   dia_semana?: string | null;
   horario?: string | null;
-  endereco?: string | null;
   bairro?: string | null;
   cidade?: string | null;
-  estado?: string | null;
   regiao?: string | null;
   descricao?: string | null;
   categoria?: string | null;
   perfil?: string | null;
+  /** Aproximadas (~1 km): a API nunca envia o ponto exato */
   latitude?: number | null;
   longitude?: number | null;
+  /** Zona que o grupo abrange, desenhada no portal: [[lat, lng], ...] */
+  area?: [number, number][] | null;
   lideres?: LiderGrupo[];
   _count?: { membros: number };
 }

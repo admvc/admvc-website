@@ -1,29 +1,37 @@
 // app/congregacoes/page.tsx
-// (Pode atualizar contactos, responsáveis e horários depois — esta página já está preparada.)
+// As congregações vêm do portal (Administração → Congregações → "No site
+// público"): nome, cidade, morada, mapa, descrição e horários. Os textos daqui
+// ficam como reserva quando o portal não tem descrição/horários ou não responde.
 
 import Link from "next/link";
 import type { Metadata } from "next";
+import { CLOUD_API_URL } from "@/lib/constants";
+import type { CongregacaoApi } from "@/lib/types";
+
+export const revalidate = 300;
 
 export const metadata: Metadata = {
   title: "Congregações",
   description:
-    "Encontre a congregação ADMVC mais perto de si — Figueira da Foz (Sede), Montemor e Barcelos. Horários, endereços e contactos.",
+    "Encontre a congregação ADMVC mais perto de si — Figueira da Foz (Sede), Montemor e Barcelos. Horários e endereços.",
 };
 
 type Congregacao = {
+  chave: string;
   badge: "Sede" | "Congregação";
   cidade: string;
   titulo: string;
   descricao: string;
   destaques: string[];
   horarios: { dia: string; hora: string; nome: string }[];
+  horariosConfirmados: boolean;
   endereco?: string;
-  contato?: string;
-  mapaUrl?: string;
+  mapaUrl?: string | null;
 };
 
-const CONGREGACOES: Congregacao[] = [
+const RESERVA: Congregacao[] = [
   {
+    chave: "sede",
     badge: "Sede",
     cidade: "Figueira da Foz",
     titulo: "Sede — Figueira da Foz",
@@ -42,13 +50,14 @@ const CONGREGACOES: Congregacao[] = [
       { dia: "Domingo", hora: "10:00", nome: "Culto da Família" },
       { dia: "Domingo", hora: "17:00", nome: "Culto da Família" }
     ],
+    horariosConfirmados: true,
     endereco: "R. António Pestana Rato 77, 3080-014 Figueira da Foz",
-    contato: "A confirmar",
     // Google Maps por endereço (pin consistente)
     mapaUrl:
       "https://www.google.com/maps/search/?api=1&query=R.%20Ant%C3%B3nio%20Pestana%20Rato%2077%2C%203080-014%20Figueira%20da%20Foz"
   },
   {
+    chave: "montemor",
     badge: "Congregação",
     cidade: "Montemor",
     titulo: "Congregação — Montemor",
@@ -63,10 +72,10 @@ const CONGREGACOES: Congregacao[] = [
       { dia: "Domingo", hora: "—:—", nome: "Culto (em definição)" },
       { dia: "Semana", hora: "—:—", nome: "Reunião/Ensino (em definição)" }
     ],
-    // TODO: morada e link do mapa de Montemor
-    contato: "A confirmar",
+    horariosConfirmados: false,
   },
   {
+    chave: "barcelos",
     badge: "Congregação",
     cidade: "Barcelos",
     titulo: "Congregação — Barcelos",
@@ -81,14 +90,46 @@ const CONGREGACOES: Congregacao[] = [
       { dia: "Domingo", hora: "—:—", nome: "Culto (em definição)" },
       { dia: "Semana", hora: "—:—", nome: "Reunião/Ensino (em definição)" }
     ],
+    horariosConfirmados: false,
     endereco: "R. Elias Garcia 105, 4750-144 Barcelos",
-    contato: "A confirmar",
     mapaUrl:
       "https://www.google.com/maps/search/?api=1&query=R.%20Elias%20Garcia%20105%2C%204750-144%20Barcelos"
   }
 ];
 
-export default function CongregacoesPage() {
+const semAcentos = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+/** As congregações do portal, com os textos daqui como reserva. Sem portal: as daqui. */
+async function obterCongregacoes(): Promise<Congregacao[]> {
+  try {
+    const res = await fetch(`${CLOUD_API_URL}/api/public/congregacoes`, { next: { revalidate: 300 } });
+    const json = await res.json();
+    if (!json.ok || !Array.isArray(json.data) || json.data.length === 0) return RESERVA;
+    return (json.data as CongregacaoApi[]).map((c) => {
+      const nome = semAcentos(c.nome);
+      const base = RESERVA.find((r) => nome.includes(r.chave) || semAcentos(c.cidade).includes(r.chave));
+      const sede = nome.includes("sede");
+      return {
+        chave: base?.chave ?? String(c.id),
+        badge: sede ? "Sede" : "Congregação",
+        cidade: c.cidade,
+        titulo: sede ? `Sede — ${c.cidade}` : `Congregação — ${c.nome}`,
+        descricao: c.descricao || base?.descricao || "Uma comunidade firmada na Palavra de Deus, em comunhão e serviço.",
+        destaques: base?.destaques ?? [],
+        horarios: c.horarios.length ? c.horarios : base?.horarios ?? [],
+        horariosConfirmados: c.horarios.length > 0 || !!base?.horariosConfirmados,
+        endereco: c.endereco || undefined,
+        mapaUrl: c.mapaUrl,
+      };
+    });
+  } catch {
+    return RESERVA;
+  }
+}
+
+export default async function CongregacoesPage() {
+  const CONGREGACOES = await obterCongregacoes();
+  const outras = CONGREGACOES.filter((c) => c.badge !== "Sede");
   return (
     <main className="space-y-16">
       {/* HERO */}
@@ -111,8 +152,13 @@ export default function CongregacoesPage() {
 
           <p className="text-muted text-base md:text-lg">
             A ADMVC tem a <strong className="text-fg">Sede na Figueira da Foz</strong> como
-            principal, com congregações em <strong className="text-fg">Montemor</strong> e{" "}
-            <strong className="text-fg">Barcelos</strong>.
+            principal{outras.length > 0 && <>, com congregações em{" "}
+            {outras.map((c, i) => (
+              <span key={c.chave}>
+                {i > 0 && (i === outras.length - 1 ? " e " : ", ")}
+                <strong className="text-fg">{c.titulo.replace("Congregação — ", "")}</strong>
+              </span>
+            ))}</>}.
           </p>
 
           <div className="flex flex-wrap gap-3 pt-2">
@@ -132,7 +178,7 @@ export default function CongregacoesPage() {
       {/* LISTA */}
       <section className="grid gap-6 md:grid-cols-3">
         {CONGREGACOES.map((c) => (
-          <CongregacaoCard key={c.titulo} c={c} />
+          <CongregacaoCard key={c.chave} c={c} />
         ))}
       </section>
 
@@ -144,8 +190,7 @@ export default function CongregacoesPage() {
               Horários e Endereços
             </h2>
             <p className="text-muted">
-              Mantemos tudo claro e organizado por cidade. Pode completar contactos e responsáveis
-              quando estiverem definidos.
+              Mantemos tudo claro e organizado por cidade.
             </p>
           </div>
 
@@ -156,7 +201,7 @@ export default function CongregacoesPage() {
 
         <div className="grid gap-6">
           {CONGREGACOES.map((c) => (
-            <CongregacaoDetail key={c.cidade} c={c} />
+            <CongregacaoDetail key={c.chave} c={c} />
           ))}
         </div>
       </section>
@@ -266,7 +311,7 @@ function CongregacaoDetail({ c }: { c: Congregacao }) {
         {/* Horários */}
         <div className="md:col-span-6">
           <div className="text-sm font-semibold text-fg">
-            {isSede ? "Agenda semanal (Sede)" : "Horários (em definição)"}
+            {c.horariosConfirmados ? "Horários" : "Horários (em definição)"}
           </div>
           <div className="mt-3 overflow-hidden rounded-xl border border-soft">
             <table className="w-full text-sm">
@@ -293,22 +338,15 @@ function CongregacaoDetail({ c }: { c: Congregacao }) {
             </table>
           </div>
           <div className="mt-2 text-xs text-muted2">
-            {isSede
-              ? "(Agenda confirmada para a Sede.)"
-              : "(Assim que a agenda for definida, atualizamos aqui.)"}
+            {!c.horariosConfirmados && "(Assim que a agenda for definida, atualizamos aqui.)"}
           </div>
         </div>
 
-        {/* Endereço / Contacto / Nota */}
+        {/* Endereço / Nota */}
         <div className="md:col-span-6 space-y-4">
           <div className="rounded-xl border border-soft bg-bg p-4">
             <div className="text-sm font-semibold text-fg">Endereço</div>
             <div className="mt-2 text-sm text-muted">{c.endereco || "A definir"}</div>
-          </div>
-
-          <div className="rounded-xl border border-soft bg-bg p-4">
-            <div className="text-sm font-semibold text-fg">Contacto</div>
-            <div className="mt-2 text-sm text-muted">{c.contato || "A definir"}</div>
           </div>
 
           {isSede && (

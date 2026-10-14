@@ -14,6 +14,26 @@ export interface DadosObra {
   arrecadado: number;
 }
 
+/** Congregação vinda do portal (/api/public/congregacoes): só dados públicos */
+export interface CongregacaoApi {
+  id: number;
+  nome: string;
+  cidade: string;
+  endereco: string;
+  mapaUrl: string | null;
+  descricao: string | null;
+  horarios: { dia: string; hora: string; nome: string }[];
+}
+
+/** Evento da agenda (/api/public/eventos): próximos 30 dias, só tipos públicos */
+export interface EventoApi {
+  id: number;
+  nome: string;
+  data: string;
+  tipo: string;
+  congregacao: { nome: string; cidade: string } | null;
+}
+
 /** Lider de grupo retornado pela API */
 export interface LiderGrupo {
   first_name: string;

@@ -2,6 +2,8 @@
 // Selecione a unidade ADMVC para visualizar a agenda
 import Link from "next/link";
 import type { Metadata } from "next";
+import { CLOUD_API_URL } from "@/lib/constants";
+import type { CongregacaoApi, EventoApi } from "@/lib/types";
 
 export const metadata: Metadata = {
   title: "Agenda Semanal",
@@ -72,6 +74,37 @@ function normalizeUnidade(v?: string): UnidadeKey {
   return "sede";
 }
 
+// Do portal: horários de cada congregação e os próximos eventos especiais.
+// Se o portal não responder, a página fica como era (sem eles).
+async function doPortal<T>(caminho: string): Promise<T[]> {
+  try {
+    const res = await fetch(`${CLOUD_API_URL}${caminho}`, { next: { revalidate: 300 } });
+    const json = await res.json();
+    return json.ok && Array.isArray(json.data) ? json.data : [];
+  } catch {
+    return [];
+  }
+}
+
+const semAcentos = (t: string) => t.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase();
+
+const TIPO_EVENTO: Record<string, string> = {
+  CULTO_ESPECIAL: "Culto especial",
+  CONVIVIO: "Convívio",
+  CULTO_RUA: "Culto de rua",
+  MISSAO: "Missão",
+  FORMACAO: "Formação",
+};
+
+function dataEvento(iso: string) {
+  const d = new Date(iso);
+  const tz = "Europe/Lisbon";
+  return {
+    dia: d.toLocaleDateString("pt-PT", { weekday: "long", day: "numeric", month: "long", timeZone: tz }),
+    hora: d.toLocaleTimeString("pt-PT", { hour: "2-digit", minute: "2-digit", timeZone: tz }),
+  };
+}
+
 export default async function AgendaPage({
   searchParams
 }: {
@@ -80,6 +113,12 @@ export default async function AgendaPage({
   const params = await searchParams;
   const active = normalizeUnidade(params?.unidade);
   const activeMeta = UNIDADES.find((u) => u.key === active) || UNIDADES[0];
+  const [congregacoes, eventos] = await Promise.all([
+    doPortal<CongregacaoApi>("/api/public/congregacoes"),
+    doPortal<EventoApi>("/api/public/eventos"),
+  ]);
+  const horariosDaUnidade =
+    congregacoes.find((c) => semAcentos(c.nome).includes(active) || semAcentos(c.cidade).includes(active))?.horarios ?? [];
 
   return (
     <main className="space-y-16">
@@ -131,7 +170,9 @@ export default async function AgendaPage({
             <p className="text-muted">
               {active === "sede"
                 ? "Agenda semanal da sede da ADMVC."
-                : "A agenda semanal será publicada assim que estiver definida."}
+                : horariosDaUnidade.length > 0
+                  ? "Encontros semanais desta congregação."
+                  : "A agenda semanal será publicada assim que estiver definida."}
             </p>
           </div>
 
@@ -199,10 +240,25 @@ export default async function AgendaPage({
           <SedeAgenda />
         ) : (
           <section className="grid gap-4 md:grid-cols-2">
-            <PlaceholderAgendaCard
-              title={`${activeMeta.label} — ${activeMeta.sub}`}
-              desc="A agenda semanal será publicada assim que estiver definida."
-            />
+            {horariosDaUnidade.length > 0 ? (
+              <div className="rounded-2xl border border-soft bg-bg2 p-6">
+                <div className="text-sm font-semibold text-fg">{`${activeMeta.label} — ${activeMeta.sub}`}</div>
+                <ul className="mt-3 divide-y divide-soft">
+                  {horariosDaUnidade.map((h, i) => (
+                    <li key={i} className="flex flex-wrap gap-x-3 py-2 text-sm">
+                      <span className="text-fg font-medium w-32">{h.dia}</span>
+                      <span className="text-fg w-14">{h.hora}</span>
+                      <span className="text-muted">{h.nome}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ) : (
+              <PlaceholderAgendaCard
+                title={`${activeMeta.label} — ${activeMeta.sub}`}
+                desc="A agenda semanal será publicada assim que estiver definida."
+              />
+            )}
             <div className="rounded-2xl border border-soft bg-bg2 p-6">
               <div className="text-sm font-semibold text-fg">Precisa de orientação?</div>
               <p className="mt-2 text-sm text-muted">
@@ -218,6 +274,30 @@ export default async function AgendaPage({
           </section>
         )}
       </section>
+
+      {/* PRÓXIMOS EVENTOS (do portal; só aparece quando há) */}
+      {eventos.length > 0 && (
+        <section className="space-y-4">
+          <h2 className="text-xl md:text-2xl font-semibold text-figueira">Próximos eventos</h2>
+          <div className="grid gap-4 md:grid-cols-2">
+            {eventos.map((e) => {
+              const { dia, hora } = dataEvento(e.data);
+              return (
+                <div key={e.id} className="rounded-2xl border border-soft bg-bg2 p-5 space-y-1">
+                  <div className="text-xs text-muted uppercase tracking-wide">
+                    {TIPO_EVENTO[e.tipo] ?? "Evento"}
+                    {e.congregacao && ` · ${e.congregacao.nome}`}
+                  </div>
+                  <div className="text-lg font-semibold text-fg">{e.nome}</div>
+                  <div className="text-sm text-muted first-letter:uppercase">
+                    {dia} · {hora}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </section>
+      )}
 
       {/* CTA FINAL */}
       <section className="rounded-2xl border border-soft bg-bg2 p-6 md:p-10 space-y-4">

@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { CLOUD_API_URL } from "@/lib/constants";
 import type { CongregacaoApi, EventoApi } from "@/lib/types";
+import InscricoesAbertas from "@/components/eventos/InscricoesAbertas";
 
 export const metadata: Metadata = {
   title: "Agenda Semanal",
@@ -274,6 +275,9 @@ export default async function AgendaPage({
           </section>
         )}
       </section>
+
+      {/* INSCRIÇÕES ABERTAS (do portal; só aparece quando há) */}
+      <InscricoesAbertas />
 
       {/* PRÓXIMOS EVENTOS (do portal; só aparece quando há) */}
       {eventos.length > 0 && (

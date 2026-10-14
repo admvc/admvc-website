@@ -4,6 +4,7 @@ import { SITE_NAME, SITE_TAGLINE, CLOUD_API_URL, DOAR_URL, VIDEO_INSTITUCIONAL_U
 import type { DadosObra } from "@/lib/types";
 import { contasObra } from "@/lib/obra-tijolos";
 import IgrejaTijolos from "@/components/obra/IgrejaTijolos";
+import InscricoesAbertas from "@/components/eventos/InscricoesAbertas";
 
 const pc = (v: number) => (Math.round(v * 10) / 10).toLocaleString("pt-PT");
 
@@ -82,6 +83,9 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* INSCRIÇÕES ABERTAS (do portal; só aparece quando há) */}
+      <InscricoesAbertas />
 
       {/* 2. ESSENCIA */}
       <section className="space-y-6">

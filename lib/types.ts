@@ -26,6 +26,18 @@ export interface CongregacaoApi {
 }
 
 /** Evento da agenda (/api/public/eventos): próximos 30 dias, só tipos públicos */
+/** Evento com inscrições abertas (portal: /api/public/inscricoes) */
+export interface InscricaoAbertaApi {
+  slug: string;
+  titulo: string;
+  subtitulo: string | null;
+  inicio: string;
+  local: string | null;
+  preco_eur: number | null;
+  cor: string;
+  url: string;
+}
+
 export interface EventoApi {
   id: number;
   nome: string;

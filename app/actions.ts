@@ -11,6 +11,10 @@ export async function enviarVisitante(
   const telefone = formData.get('telefone')
   const pedido_oracao_raw = formData.get('pedido_oracao') as string | null
 
+  // Armadilha para robôs: campo escondido que uma pessoa nunca preenche. Finge que correu bem.
+  const empresa = formData.get('empresa')
+  if (typeof empresa === 'string' && empresa.trim()) return { success: true }
+
   if (!nome || typeof nome !== 'string' || nome.trim().length < 2) {
     return { success: false, error: 'Por favor, insira o seu nome.' }
   }
@@ -34,6 +38,7 @@ export async function enviarVisitante(
         telefone: telefone.trim(),
         pedido_oracao,
         consentimento: true,
+        origem: 'SITE',
       }),
     })
 

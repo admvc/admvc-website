@@ -60,6 +60,8 @@ export default function BemVindoPage() {
                     </div>
 
                     <form action={formAction} className="space-y-5">
+                    {/* Armadilha para robôs: escondida das pessoas */}
+                    <input name="empresa" type="text" tabIndex={-1} autoComplete="off" aria-hidden="true" className="absolute -left-[9999px] h-px w-px opacity-0" />
 
                         {state.error && (
                             <div role="alert" aria-live="assertive" className="rounded-2xl border border-red-500/20 bg-red-500/5 px-4 py-3 text-xs font-bold text-red-400">
